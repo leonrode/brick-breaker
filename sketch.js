@@ -40,19 +40,19 @@ let slotMachineImg;
 let pokerTableImg;
 
 const cardImgSrcs = [
-  "./img/2-hearts.png",
-  "./img/7-clubs.png",
-  "./img/8-spades.png",
-  "./img/10-hearts.png",
-  "./img/ace-spades.png",
-  "./img/king-hearts.png",
+  "img/2-hearts.png",
+  "img/7-clubs.png",
+  "img/8-spades.png",
+  "img/10-hearts.png",
+  "img/ace-spades.png",
+  "img/king-hearts.png",
 ]
 let cardImgs = [];
 
 function preload() {
-  pokerChipImg = loadImage("./img/poker-chip.png");
-  slotMachineImg = loadImage("./img/slot-machine.png");
-  pokerTableImg = loadImage("./img/poker-table.png");
+  pokerChipImg = loadImage("img/poker-chip.png");
+  slotMachineImg = loadImage("img/slot-machine.png");
+  pokerTableImg = loadImage("img/poker-table.png");
   for (const imgSrc of cardImgSrcs) {
     cardImgs.push(loadImage(imgSrc));
   }
