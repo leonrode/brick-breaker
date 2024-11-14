@@ -18,8 +18,8 @@ let ballX = INITIAL_BALL_X;
 let ballY = INITIAL_BALL_Y;
 
 // + is down, right
-const initVelocityX = 7;
-const initVelocityY = 7;
+const initVelocityX = 0;
+const initVelocityY = -10;
 const BALL_SPEED = Math.sqrt(initVelocityX * initVelocityX + initVelocityY * initVelocityY);
 let ballVelocity = [initVelocityX, initVelocityY];
 
@@ -93,10 +93,10 @@ function drawBall() {
 }
 
 function platformMovement() {
-  if (keyIsDown(LEFT_ARROW)) {
+  if (keyIsDown(LEFT_ARROW) && platformX > 0) {
     platformX -= PLATFORM_SPEED
   } 
-  if (keyIsDown(RIGHT_ARROW)) {
+  if (keyIsDown(RIGHT_ARROW) && platformX < WIDTH - PLATFORM_WIDTH) {
     platformX += PLATFORM_SPEED
   }
 }
@@ -206,19 +206,19 @@ function ballBrickCollisions() {
 
     if (hitBottomFace) {
       ballVelocity[1] *= -1;
-      ballY = brickY + BRICK_HEIGHT + BALL_RADIUS + 2;
+      ballY = brickY + BRICK_HEIGHT + BALL_RADIUS + 5;
       bricksPositions.splice(i, 1);
     } else if (hitRightFace){
       ballVelocity[0] *= -1;
-      ballX = brickX + brickWidth + BALL_RADIUS + 2;
+      ballX = brickX + brickWidth + BALL_RADIUS + 5;
       bricksPositions.splice(i, 1);
     } else if (hitLeftFace) {
       ballVelocity[0] *= -1;
-      ballX = brickX - BALL_RADIUS - 2;
+      ballX = brickX - BALL_RADIUS - 5;
       bricksPositions.splice(i, 1);
     } else if (hitTopFace) {
       ballVelocity[1] *= -1;
-      ballY = brickY - BALL_RADIUS - 2;
+      ballY = brickY - BALL_RADIUS - 5;
       bricksPositions.splice(i, 1);
     }
     
