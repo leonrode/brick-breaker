@@ -19,17 +19,16 @@ let ballY = INITIAL_BALL_Y;
 
 // + is down, right
 const initVelocityX = 0;
-const initVelocityY = -10;
+const initVelocityY = 10;
 const BALL_SPEED = Math.sqrt(initVelocityX * initVelocityX + initVelocityY * initVelocityY);
 let ballVelocity = [initVelocityX, initVelocityY];
 
 const NUM_COLS_OF_BRICKS = 12; // width auto determined
-const NUM_ROWS_OF_BRICKS = 4;
+const NUM_ROWS_OF_BRICKS = 3;
 const BRICK_HEIGHT = 80;
 
-const BRICK_WALL_Y_START = 50;
+const BRICK_WALL_Y_START = 100;
 
-// [x, y] coordinates of top left corners of bricks
 let bricksPositions = [];
 
 
@@ -76,7 +75,6 @@ function draw() {
   ballMovement();
   ballWallCollisions();
   ballBrickCollisions();
-
   
 }
 
@@ -85,10 +83,6 @@ function drawPlatform() {
 }
 
 function drawBall() {
-  // fill(255);
-  // circle(ballX, ballY, 2 * BALL_RADIUS);
-
-  // image(src, x, y, width, height);
   image(pokerChipImg, ballX - BALL_RADIUS, ballY - BALL_RADIUS, 2 * BALL_RADIUS, 2 * BALL_RADIUS);
 }
 
@@ -107,10 +101,18 @@ function ballMovement() {
 }
 
 function ballWallCollisions() {
-  if (ballX + BALL_RADIUS >= WIDTH || ballX - BALL_RADIUS <= 0) { // right, left walls 
+  if (ballX + BALL_RADIUS >= WIDTH) { // right, left walls 
     ballVelocity[0] *= -1;
-  } if (ballY - BALL_RADIUS <= 0 || ballY + BALL_RADIUS >= WIDTH) { // top, bottom walls
-    //ballVelocity[1] *= -1
+    ballX = WIDTH - BALL_RADIUS
+  } if (ballX - BALL_RADIUS <= 0) { // left wall
+    ballVelocity[0] *= -1;
+    ballX = BALL_RADIUS;
+  } 
+  if (ballY - BALL_RADIUS <= 0) {
+    ballVelocity[1] *= -1;
+    ballY = BALL_RADIUS;
+  }
+  if (ballY + BALL_RADIUS >= HEIGHT) { // top, bottom walls
     resetBallPosition();
     resetBallVelocity();
   }
@@ -132,9 +134,9 @@ function ballPlatformCollisions() {
   const isBetweenPlatformXBounds = ballX + BALL_RADIUS >= platformX && ballX - BALL_RADIUS <= platformX + PLATFORM_WIDTH;
   const isBetweenPlatformYBounds = ballY + BALL_RADIUS >= platformY && ballY - BALL_RADIUS <= platformY + PLATFORM_HEIGHT;
 
-  const hitPlatformTop = isBetweenPlatformXBounds && ballY + BALL_RADIUS >= platformY && ballY < platformY;
-  const hitPlatformLeft = isBetweenPlatformYBounds && (ballX + BALL_RADIUS >= platformX) && ballX < platformX + PLATFORM_WIDTH;
-  const hitPlatformRight = isBetweenPlatformYBounds && (ballX - BALL_RADIUS <= platformX + PLATFORM_WIDTH) && ballX > platformX; 
+  const hitPlatformTop = ballVelocity[1] > 0 && isBetweenPlatformXBounds && ballY + BALL_RADIUS >= platformY && ballY < platformY;
+  const hitPlatformLeft = ballVelocity[0] > 0 && isBetweenPlatformYBounds && (ballX + BALL_RADIUS >= platformX) && ballX < platformX + PLATFORM_WIDTH;
+  const hitPlatformRight = ballVelocity[0] < 0 && isBetweenPlatformYBounds && (ballX - BALL_RADIUS <= platformX + PLATFORM_WIDTH) && ballX > platformX; 
 
   if (hitPlatformTop) {
 
@@ -196,14 +198,14 @@ function ballBrickCollisions() {
     
     const [brickX, brickY] = brick;
 
-    const isBetweenBrickXBounds = ballX + BALL_RADIUS > brickX && ballX - BALL_RADIUS < brickX + brickWidth;
-    const isBetweenBrickYBounds = ballY - BALL_RADIUS < brickY + BRICK_HEIGHT && ballY + BALL_RADIUS > brickY;
+    const isBetweenBrickXBounds = (ballX + BALL_RADIUS > brickX) && (ballX - BALL_RADIUS < brickX + brickWidth);
+    const isBetweenBrickYBounds = (ballY - BALL_RADIUS < brickY + BRICK_HEIGHT) && (ballY + BALL_RADIUS > brickY);
 
-    const hitBottomFace = isBetweenBrickXBounds && (ballY - BALL_RADIUS < brickY + BRICK_HEIGHT) && ballY > brickY + BRICK_HEIGHT;
-    const hitRightFace = isBetweenBrickYBounds && (ballX - BALL_RADIUS < brickX + brickWidth) && ballX > brickX + brickWidth;
-    const hitLeftFace = isBetweenBrickYBounds && (ballX + BALL_RADIUS > brickX) && ballX < brickX;
-    const hitTopFace = isBetweenBrickXBounds && (ballY + BALL_RADIUS > brickY) && ballY < brickY;
-
+    const hitBottomFace = ballVelocity[1] < 0 && isBetweenBrickXBounds && (ballY - BALL_RADIUS < brickY + BRICK_HEIGHT) && ballY > brickY + BRICK_HEIGHT;
+    const hitRightFace = ballVelocity[0] < 0 && isBetweenBrickYBounds && (ballX - BALL_RADIUS < brickX + brickWidth) && ballX > brickX + brickWidth;
+    const hitLeftFace = ballVelocity[0] > 0 && isBetweenBrickYBounds && (ballX + BALL_RADIUS > brickX) && ballX < brickX;
+    const hitTopFace = ballVelocity[1] > 0 && isBetweenBrickXBounds && (ballY + BALL_RADIUS > brickY) && ballY < brickY;
+    
     if (hitBottomFace) {
       ballVelocity[1] *= -1;
       ballY = brickY + BRICK_HEIGHT + BALL_RADIUS + 5;
@@ -212,7 +214,7 @@ function ballBrickCollisions() {
       ballVelocity[0] *= -1;
       ballX = brickX + brickWidth + BALL_RADIUS + 5;
       bricksPositions.splice(i, 1);
-    } else if (hitLeftFace) {
+    } else  if (hitLeftFace) {
       ballVelocity[0] *= -1;
       ballX = brickX - BALL_RADIUS - 5;
       bricksPositions.splice(i, 1);
@@ -221,6 +223,5 @@ function ballBrickCollisions() {
       ballY = brickY - BALL_RADIUS - 5;
       bricksPositions.splice(i, 1);
     }
-    
   }
 }
